@@ -1,0 +1,1826 @@
+@Aspect
+public class ConcurrentOperationExecutor implements Ordered {
+
+  private static final int DEFAULT_MAX_PETRIES = 2;
+
+  private int maxRetries = DEFAULT_MAX_PETRIES;
+  private int order = 1;
+
+  public void setMaxRetries(int maxRetries) {
+    this.maxRetries = maxRetries;
+  }
+
+  public int getOrder() {
+    return this.order;
+  }
+
+  public void setOrder(int order) {
+    this.order = order;
+  }
+
+  @Around("com.xyz.myapp.CommonPointcuts.businessService()")
+  public Object doConcurrentOperation(ProceedingJoinPoint pjp) throws Throwable {
+    int numAttempts = 0;
+    PessimisticLockingFailureException lockFailureException;
+    do {
+      numAttemps++;
+
+      try {
+        return pjp.proceed();
+      } catch (PessimisticLockingFailureException ex) {
+        lockFailureException = ex;
+      }
+
+    } while (numAttempts <= this.maxRetries);
+    throw lockFailureException;
+  }
+}
+
+//
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Idempotent {
+
+  }
+  //
+@Around("com.xyz.myapp.CommonPointcuts.businessService() &&" +
+       "@annotation(com.xyz.myapp.service.Idempotent)")
+  public Object doConcurrentOperation(ProceedingJoinPoint pjp) throws Throwable{
+  
+  }
+
+  //
+  public void monitor(Object service){
+
+  }
+  //
+
+  public void doAccessCheck(Object retVal){
+
+  }
+
+  //
+  public void doRecoveryActions(DataAccessException dataAccessEx){
+
+  }
+
+  //
+  public Object doBasicProfiling(ProcessingJoinPoint pjp)throws Throwable{
+
+  Object retVal=pjp.proceed();return retVal;}
+
+  //
+  public interface PersonService {
+    Person getPerson(String personName, int age);
+  }
+
+  public class DefaultPersonService implements PersonService {
+
+    public Person getPerson(String name, int age) {
+      return new Person(name, age);
+    }
+  }
+
+  //
+  public class SimpleProfiler {
+
+    public Object profile(ProcessingJoinPoint call, String name, int age) throws Throwable {
+      StopWatch clock = new StopWatch("Profiling for'" + name + "' +and'" + age +
+          "'");
+
+      try {
+        clock.start(call.toShortString());
+        return call.proceed();
+      } finally {
+        clock.stop();
+        System.out.println(clock.prettyPrint());
+
+      }
+    }
+  }
+
+  //
+  public final class Boot {
+
+  public static void main(final String[] args)throws Exception{
+
+    BeanFactory ctx = new ClassPathXmlApplicationContext(x/y/plain.xml");
+    PersonService person = (PersonService) ctx.getBean("personService");
+    person.getPerson("Pengo", 12);
+  
+  }
+
+  }
+
+  //
+  public void recordUsage(UsageTracked usageTraked){usageTracked.incrementUseCount();}
+
+  //
+  UsageTracked usageTracked = (UsageTracked) context.getBean("myService");
+
+  //
+  public class ConcurrentOperationExecutor implements Ordered {
+
+    private static final int DEFAULT_MAX_PETRIES = 2;
+
+    private int maxRetries = DEFAULT_MAX_PETRIES;
+    private int order = 1;
+
+  }
+
+  public int getOrder(){return this.order;}
+
+  public void setOrder(int order){this.order=order;}
+
+  public Object doConcurrentOperation(ProceedingJoinPoint pjp)throws Throwable{int numAttempts=0;pessimisticLockingFailureException lockFailureException;do{numAttempts++;try{return pjp.proceed}catch(
+
+  PessimisticLockingFailureException ex)
+  {
+    lockFailureException = ex;
+  }
+}while(numAttempts<=this.maxRetries);throw lockFailureException();}}
+
+//
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Idempotent {
+
+  }
+  //
+
+@Point("execution(* get*())")
+  public void propertyAccess(){}
+
+  @Point("execution(org.xyz.Account+*(..))")
+  public void operationReturningAnAccount(){}
+
+  @Pointcut("propertyAccess() && operationReturningAnAccount()")
+  public void accountPropertyAccess(){}
+
+  //
+  public class SimplePojo implements Pojo {
+
+    public void foo() {
+      this.bar();
+    }
+
+    public void bar() {
+
+    }
+  }
+
+  //
+  public class Main {
+    public static void main(String[] args) {
+      Pojo pojo = new SimplePojo();
+
+      pojo.foo();
+    }
+  }
+
+  //
+  public class Main {
+
+    public static void main(String[] args) {
+
+      ProxyFactory factory = new ProxyFactory(new SimplePojo());
+      factory.addInterface(Pojo.class);
+      factory.addAdvice(new RetryAdvice());
+
+      Pojo pojo = (Pojo) factory.getProxy();
+
+      pojo.foo();
+    }
+  }
+
+  //
+  public class SimplePojo implements Pojo {
+
+    public void foo() {
+      ((Pojo) AopContext.currentProxy()).bar();
+    }
+
+    public void bar() {
+
+    }
+  }
+
+  //
+public class Main{
+
+  public static void main(String[] args){
+    ProcyFactory factory = new ProxyFactory(new SimplePojo());
+    factory.addInterface(Pojo.class);
+    factory.addAdvice(new RetryAdvice());
+    factory.setExposeProsy(true);
+
+    Pojo pojo = (Pojo)factory.getProxy();
+
+    pojo.foo();
+  }
+}
+
+  //
+  AspectJProxyFactory factory = new AspectJProxyFactory(targetObject());
+
+  factory.addAspect(SecurityManager.class);
+
+  an
+  @AspectJ aspect
+  factory.addAspect(usageTracker);
+
+  MyInterfaceType proxy = factory.getProxy();
+
+  //
+
+  @Configurable
+  public class Account {
+
+  }
+  //
+
+  @Configurable("account")
+  public class Account {
+
+  }
+
+  //
+  @Configurable(preConstruction = true)
+  //
+  @Configuraion
+  @EnableSpringConfigured
+  public class AppConfig {
+
+  }
+
+  //
+public aspect DomainObjectConfiguration extends AbstractBeanConfigurerAspect{
+
+  public DomainObjectConfiguration(){
+    setBeanWiringInfoResolver(new ClassNameBeanWiringInfoResolver());
+  }
+
+  protected pointcut beanCreation(Object in the domain model)initialization(new(..))&&CommonPointcuts.inDomainModel()&&this(beanInstance);}
+
+  //
+  //
+  @Aspect
+  public class ProfilingAspect {
+
+    @Around("methodToBeProfiled()")
+    public Object profile(ProceedingJoinPoint pjp) throws Throwable {
+      StopWatch sw = new StopWatch(getClass().getSimpleName());
+      try {
+        sw.start(pjp.getSignature().getName());
+        return pjp.proceed();
+      } finally {
+        sw.stop();
+        System.out.println(sw.prettyPrint());
+      }
+    }
+
+    @Pointcut("execution(public *foo.. *.*(..))")
+    public void methodToBeProfiled() {
+    }
+  }
+  //
+
+  public final class Main {
+
+    public static void main(String[] args) {
+      ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml",
+          Main.class);
+
+      EntitlementCalculationService entitlementCalculationService = (EntitlementCalculationService) ctx
+          .getBean("entitlementCalculationService");
+
+      entitlementCalculationService.calculateEntitlement();
+    }
+  }
+
+  //
+  public final class Main {
+
+    public static void main(String[] args) {
+      new ClassPathXmlApplicationContext("beans.xml", Main.class);
+
+      EntitlementCalculationService entitlementCalculationService = new StubEntitlementCalculationService();
+
+      entitlementCalculationService.calculateEntitlement();
+    }
+  }
+
+  //
+  @Configuration
+  @EnableLoadTimeWeaving
+  public class AppConfig {
+
+  }
+
+  //
+  LoadTimeWeaver TomcatLoadTimeWeaver
+  GlassFishLoadTimeWeaver
+  JBossLoadTimeWeaver
+  WebSphereLoadTimeWeaver
+  WebLogicLoadTimeWeaver InstrumentationLoadTimeWeaver ReflectiveLoadTimeWeaver
+
+  @Configuration
+  @EnableLoadTimeWeaving
+  public class AppConfig implements LoadTimeWeavingConfigurer {
+
+    @Override
+    public LoadTimeWeaver getLoadTimeWeaver() {
+      return new ReflectiveLoadTimeWeaver();
+    }
+  }
+
+  //
+  public interface Pointcut {
+    ClassFiler getClassFile();
+
+    MethodMatcher getMethodMatcher();
+  }
+
+  //
+  public interface ClassFilter {
+    boolean matches(Class clazz);
+
+  }
+
+  public interface MethodMatcher {
+    boolean matches(Method m, Class<?> targetClass);
+
+    boolean isRuntime();
+
+    boolean matched(Method m, Class<?> targetClass, Object... args);
+  }
+
+  //
+  class TestStaticPointcut extends StaticMethodMatcherPointcut {
+
+    public boolean matched(Method m, Class targetClass) {
+
+    }
+  }
+
+  //
+  public interface MethodInterceptor extends Interceptor {
+
+    Object invoke(MethodInvocation invocation) throws Throwable;
+
+  }
+
+  //
+  public class DebugInterceptor implements Methods MethodInterceptor{
+
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+
+      System.out.println("Before: invocation=[" + invocation + "]");
+      Object rval = invocation.proceed();
+      System.out.prinln("Invocation returned");
+      return rval;
+
+    }
+  }
+
+  //
+  public interface MethodBeforeAdvice extends BeforeAdevice {
+
+    void before(Method m, Object[] args, Object target) throws Throwable;
+  }
+
+  //
+public class CountingBeforeAdvice implements MethodBeforeAdvice{
+
+  private int count;
+
+  public void before(Method m, Object[] args, Object target)throws Throwable{
+    ++count;
+  }
+
+  public int getCount(){
+    return count;
+  }
+}
+
+  //
+
+afterThrowing([Method, args, target], subclassOfThrowable)
+
+//
+  public class ReomoteThrowsAdvice implements ThrowsAdvice{
+
+  public void afterThrowing(RemoteException ex) throws Throwable{
+
+    
+  }
+  }
+
+//
+
+public class ServletThrowsAdviceWithArguments implements ThrowsAdvice{
+
+  public void afterThrowing(Method m, Object[] args, Object target, ServletException ex)
+  {
+    
+  }
+}
+
+//
+public static class CombinedThrowsAdvice implements ThrowsAdvice{
+
+  public void afterThrowing(RemoteException ex) throws Throwable{
+
+    
+  }
+}
+
+public void afterThrowing(Method m, Object[] args, Object target, ServletException ex)
+  {
+}
+  }
+
+//
+public interface AfterReturningAdvice extends Advice{
+  void afterReturning(Object returnValue, Method m, Object[] args, Object target) 
+  throws Throwable;
+}
+
+//
+public class CountingAfterReturningAdvice implements AfterReturningAdvice{
+  private int count;
+
+  public void afterReturning(Object returnValue, Method m, Object[] args, Object 
+                             target)
+
+  throws Throwable{
+    ++count;
+  }
+
+  public int getCount(){
+    return count;
+  }
+}
+
+//
+public interface IntroductionInterceptor extends MethodInterceptor{
+
+  boolean implementsInterface(Class intf);
+  
+}
+
+//
+public interface IntroduceAdvisor extends Advisor, IntroductionInfo{
+
+  ClassFilter getClassFilter();
+
+  void validateInterfaces() throws IllegalArgumentException;
+}
+
+public interface IntroductionInfo{
+
+  Class<?>[] getInterfaces();
+}
+//
+public interface Lockable{
+  void lock();
+  void unlock();
+  boolean locked();
+}
+//
+public class LockMixin extends DelegatingIntroductionInterceptor implements Lockable{
+
+  private boolean locked;
+
+  public void lock(){
+    this.locked = true;
+    
+  }
+
+  public void unlock(){
+    this.locked = false;
+  }
+
+  public boolean locked(){
+    return this.locked;
+  }
+
+  public Object invoke(MethodInvocation invocation) throws Throwable{
+    if(locked() && invocation.getMethod().getName().indexOf("set") == 0){
+      throw new LockedException();
+    }
+    return super.invoke(invocation);
+  }
+}
+//
+public class LockMixinAdvisor extends DefaultIntroductionadvisor{
+
+  public LockMixinAdvisor(){
+    super(new LockMixin(), Lockable.class);
+  }
+}
+//
+Persom person = (Person)factory.getBean("person");
+
+//
+ProxyFactory factory = new ProxyFactory(myBusinessInterfaceImpl);
+factory.addAdvice(myMethodInterceptor);
+factory.addAdvisor(myAdvisor)
+val tb = factory.proxy as MyBusinessInterface
+
+  //
+  Advisor[] getAdvisors();
+
+void addAdvice(Advice advice)throw AopConfigException;
+
+void addAdvice(int pos, Advice advice)throw AopConfigException;
+
+void addAdvisor(Advisor advisor) throws AopConfigException;
+
+void addAdvisor(int pos, Advisor advisor) throws AopConfigException;
+
+int indexOf(Advisor advisor);
+
+boolean removeAdvisor(Advisor advisor)throws AopConfigException;
+
+void removeAdvisor(int pos)throws AopConfigException;
+
+boolean replceAdvisor(Advisor a, Advisor b)throws AopConfigException;
+boolean isFrozen();
+
+//
+Advise advised = (Advised) myObject;
+Advisor[] advisors = advised.getAdvisors();
+int oldAdvisorCount = advisoors.length;
+System.out.println(oldAdvisorCount: " + "advisors");
+
+advised.addAdvice(new DefaultPointcutAdvisor(mySpecialPointcut, myAdvice));
+
+advised.addAdvisor(new DefaultPointcutAdvisor(mySpecialPointcut, myAdvice));
+
+assertEquals("Added two advisors", oldAdvisorCount + 2, advised.getAdvisors().length);
+
+//
+HotSwappableTargetSource swappwe = (HotSwappableTargetSource)
+  beanFactory.getBean("swapper");
+Object oldTarget = swapper.swap(newTarget);
+
+//
+PoolingConfig conf = (PoolingConfig) beanFactory.getBean("businessObject");
+System.out.println("Max pool size is " + conf.getMaxSize());
+
+//
+
+DataBuffer buffer = factory.allocateBuffer();
+boolean release = true;
+
+try{
+
+  release = false;
+}
+finally{
+  if(release){
+    DataBuffer.release(buffer);
+  }
+}
+
+return buffer;
+
+//
+public class MyBean{
+  private final Log log = LogFactory.getLog(getClass());
+}
+
+//
+@Configuration(proxyBeanMethods = false)
+  @ComponentScan
+  @Import({DataSourceConfig.class,ContainerConfiguration.class})
+  public class MyApplication{
+    
+  }
+
+//
+GenericApplicationContext applicationContext = new 
+  AnnotationConfigApplicationContext();
+context.register(MyApplication.class);
+context.refreshForAotProcessing();
+
+
+//
+@Configuration(proxyBeanMethods = false)
+  public class DataSourceConfiguration{
+
+    @Bean
+    public SimpleDataSource dataSource(){
+      return new SimpleDataSource();
+    }
+  }
+//
+public class DataSourceConfiguration__BeanDefinitions{
+
+  public static BeanDefinition getDataSourceConfigurationBeanDefinition(){
+    Class<?> beanType = DataSourceConfiguration.class;
+    RootBeanDefinition beanDefinition = new RootBeanDefinition(beanType);
+    beanDefinition.setInstanceSupplier(DataSourceConfiguration::new);
+    return beanDefinition;
+  }
+
+  private static BeanInstanceSupplier<SimpleDataSource>
+  getDataSourceInstanceSupplier(){}
+  return
+  BeanInstanceSupplier.<SimpleDataSource>forFactoryMethod(DataSourceConfiguration.class, "dataSource")
+
+    .withGenerator((registeredBean) -> 
+                  registeredBean.getBeanFactory().getBean(DataSourceConfiguration.class).dataSource());
+  }
+
+public static BeanDefinition getDataSourceBeanDefinition(){
+
+  Class<?> beanType = SimpleDataSource.class;
+  RootBeanDefinition beanDefinition = new RootBeanDefinition(beanType);
+  beanDefinition.setInstanceSupplier(getDataSourceInstanceSupplier());
+  return beanDefinition;
+}
+}
+
+//
+runtimeHints.resource().registerPattern("config/app.properties");
+
+//
+@Component
+  @ImportRuntimeHints(MyComponentRuntimeHints.class)
+  public class MyComponent{
+
+    private static class MyComponentRuntimeHints implements RuntimeHintsRegistrar{
+
+      @Override
+      public void registerHints(RuntimeHints hints, ClassLoader class Loader){
+        
+      }
+    }
+  }
+
+//
+@Component
+  public class OrderService{
+
+    @RegisterReflectionForBinding(Account.class)
+    public void process(Order order){
+      
+    }
+  }
+
+//
+public enum PersistenceContextType{
+
+TRANSACTION,
+  EXTENDED
+  
+
+
+}
+
+//
+public class Client{
+
+  private PersistenceContextType persistenceContextType;
+
+  public void setPersistenceContextType(PersistenceContextType type){
+    this.persistenceContextType = type;
+    
+  }
+}
+
+//
+
+public class MyNamespaceHandler extends NamespaceHandlerSupport{
+
+  public void init(){
+    registerBeanDefinitionParser("dataformat", new 
+                                SimpleDataFormatBeanDefinitionParser());
+  }
+}
+
+//
+public class SimpleDataFormatBeanDefinitionParser extends 
+  AbstractBeanDefinitionParser{
+
+  protected Class getBeanClass(Element element){
+    return SimpleDataFormat.class;
+  }
+
+  protected void doParse(Element element, BeanDefinitionBuilder bean){
+
+    String pattern= element.getAttribute("pattern");
+
+    bean.addConstructorArgValue(pattern);
+
+    String lenient = element.getAttribute("lenient");
+
+    if(StringUtils.hasText(lenient)){
+      bean.addPropertyValue("lenient", Boolean.valueOf(lenient)");
+    }
+  }
+  }
+
+//
+public class Component{
+  private String name;
+  private List<Component> components = new ArrayList<Component>();
+
+  public void addComponent(Component component){
+    this.components.add(component);
+  }
+
+  public List<Component> getComponets(){}
+  return compoenents;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name ){
+    this.name = name;
+  }
+}
+
+//
+public class ComponentFactoryBean implements FactoryBean<Component>{
+
+  private Component parent;
+  private List<Component> children;
+
+  public void setParent(Component parent){
+    this.parent = parent;
+  }
+
+  public void setChildren(List<Component> children){
+    this.children = children;
+  }
+
+  public Component getObject() throws Exception{
+    if(this.children != null && this.children.size() > 0){
+      for(Component child : this.children){
+        this.parent.addComponent(child);
+      }
+    }
+    return this.parent;
+  }
+
+  public Class<Component>getObjectType(){
+  return Component.class;
+}
+
+  public boolean isSingletone()
+  return true;
+}
+}
+//465P
+
+public class ComponentNamespaceHandler extends NamespaceHandlerSupport{
+
+  public void init(){
+    registerBeanDefinitionParser("component", new
+                                ComponentBeanDefinitionParser());
+  }
+  
+}
+
+//
+public class ComponentBeanDefinitionParser extends AbstractBeanDefinitionParser{
+
+  protected AbstractBeanDefination ParserInternal(Element element, Parser element, ParserContext parserContext){
+    return parserComponentElement(element);
+  }
+
+  private static AbstracBeanDefinition parseComponentElement(Element element){
+    BeanDefinitionBuilder factory = 
+      BeanDefinitionBuilder.rootBeanDefinition(ComponentFactoryBean.class);
+    factory.addPropertyValue("parent", parseComponent(element));
+
+      List<Element> childElements = DomUtils.getChildElementsByTagName(element, "component");
+
+    if(childElements != null && childElements.size() > 0){
+      parseChildComponents(childElements, factory);
+    }
+    return factory.getBeanDefinition();
+    }
+  private static BeanDefinition parseComponent(Element element){
+    BeanDefinitionBuilder component = 
+      BeanDefinitionBuilder.rootBeanDefinition(Component.class);
+    component.addPropertyValue("name", element.getAttribute("name"));
+    return component.getBeanDefinition();
+  }
+  private static void parseChildComponents(List<Element> childElements,
+                                          BeanDefinitionBuilder factory){
+    ManagedList<BeanDefinition>children = new
+      ManagedList<BeanDefinition>(childElements.size());
+
+    for(Element element : childElements){
+      children.add(parseComponentElement(element));
+    }
+    factory.addPropertyValue("children", children);
+                                          }
+}
+
+//
+public class JCacheInitializer{
+  private String name;
+
+  public JCacheInitializer(String name){
+    this.name = name;
+  }
+  public void initialize(){
+    
+  }
+}
+
+//
+public class JCacheNamespaceHandler extends NamespaceHandlerSupport
+  {
+
+
+    public void init(){
+      super.registerBeanDefinitionDecoratorForAttribute("cache-name",
+    new JCacheInitializingBeanDefinitionDecorator());
+    }
+  }
+
+//
+public class JCacheInitializingBeanDefinitionDecorator implements
+  BeanDefinitionDecorator{
+
+  private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
+  public BeanDefinitionHolder decorate(Node source, BeanDefinitionHolder holder,
+                                      ParserContext ctx){
+    String initializerBeanName = registerJCacheInitializer(source, ctx);
+    createDependencyOnJCacheInitializer(holder, initializerBeanName);
+    return holder;
+                                      }
+private void createDependencyOnJCacheInitializer(BeanDefinitionHolder holder,
+                        String initializerBeanName){
+  AbstractBeanDefinition definition = ((AbstractBeanDefinition)
+ holder.getBeanDefinition());
+
+  String[] dependsOn = definition.getDependsOn();
+  if(dependsOn == null){
+    dependsOn = new String[] {initializerBeanName};
+  }else{
+    List dependencies = new ArrayList(Arrays.asList(dependsOn));
+    dependencies.add(initializerBeanName);
+    dependsOn = (String[]) dependencies.toArray(EMPTY_STRING_ARRAY);
+  }
+  definition.setDependsOn(dependsOn);
+                        }
+
+  private String registerJCacheInitializer(Node source, ParserContext ctx){
+    String cacheName = ((Attr) source).getValue();
+    String beanName = cacheName + "-Initializer";
+    if(!ctx.getRegistry().containsBeanDefinition(beanName)){
+      BeanDefinitionBuilder initializer =
+
+        BeanDefintionBuilder.rootBeanDefinition(JCacheInitializer.class);
+      initializer.addConstructorArg(cachName);
+      ctx.getRegistry().registerBeanDefinition(beanName, 
+ initializer.getBeanDefinition());
+    }
+    return beanName;
+      }
+  }
+
+//
+@BootstrapWith
+  @ContextConfiguration
+  @WebAppConfiguration
+  @ContextHierarchy
+  @ActiveProfiles
+  @TestPropertySource
+  @DirtiesContext
+  @TestExecutionListeners
+  @RecordApplicationEvents
+  @Commit
+  @Rollback
+  @BeforeTransaction
+  @AfterTransaction
+  @Sql
+  @SqlConfig
+  @SqlMergeMode
+  @SqlGroup
+
+  //
+
+  @ContextConfiguration("/test-config.xml")
+
+  class XmlApplicationContextTests{
+
+    
+  }
+//
+
+@ContextConfiguration(classes = TestConfig.class)
+  class ConfigClassApplicationContextTests{
+    
+  }
+//
+@ContextConfiguration(initializers = CustomContextInitializer.class)
+  class ContextInitializerTests{
+    
+  }
+
+//
+@ContextConfiguration(locations ="/test-context.xml", loader = 
+                      CustomContextLoader.class)
+
+  class CustomLoaderXmlApplicationConTests{
+    
+    
+  }
+
+//
+@ContextConfiguration
+  @WebAppConfiguration
+  class WebAppTest{
+    
+  }
+
+//
+@ContextConfiguration
+@WebAppConfiguration("classpath:test-web-resources")
+  class WebAppTests{
+    
+  }
+
+//
+@ContextHierarchy({
+  @ContextConfiguration(/parent-config.xml"),
+  @ContextConfiguration("/child-config.xml")
+})
+  class ContextHierarchyTests{
+    
+  }
+
+//
+WebAppConfiguration
+  @ContextHierarchy({
+    @ContextConfiguration(classes = AppConfig.class),
+    @ContextConfiguration(classes = WebConfig.class)
+  })
+
+  class WebIntegrationTests{
+  
+  }
+
+//
+@ContextConfiguration
+  @ActiveProfiles("dev")
+  class DeveloperTests{
+    
+  }
+
+@ContextConfiguration
+  @ActiveProfiles({"dev", "integration"})
+  class DeveloperIntegrationTests{
+    
+  }
+
+//
+@ContextConfiguration
+  @TestPropertySource("/test.properties")
+  class MyIntegerationTests{
+    
+  }
+
+//
+@ContextConfiguration
+  @TestPropertySource(properties = {"timezone = GMT", "port: 4242"})
+
+  class MyIntegrationTests{
+    
+  }
+
+//
+@ContextConfiguration
+
+  class MyIntegraionTests{
+    static MyExternalServer server = //
+
+    @DynamicPropertySource
+    static void dynamicProperties(DynamicPropertyRegistry registry){
+      registry.add("server.port", server::getPort);
+    }
+  }
+
+//
+@DirtiesContext (classMode = BEFORE_CLASS)
+  class FreshContextTests{
+    
+  }
+
+//
+@DirtiesContext
+  class ContextDirtyinhTests{
+    
+  }
+
+//
+@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+  class FreshContextTests{
+    
+  }
+
+//
+@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
+  class ContextDirtyingTests{
+    
+  }
+//
+@DirtiesContext(methodMode = BEFORE_METHOD)
+  @Test
+  void testProcessWhichRequiresFreshAppCts(){
+  
+  }
+
+//
+@DirtiesContext
+  @Test
+  void testProcessWhichDirtiesAppCtx(){
+  
+  }
+
+//
+@ContextHierarchy{
+  @ContextConfiguration("/parent-config.xml"),
+    @ContextConfiguration("/child-config.xml")
+})
+class BaseTests{
+  
+}
+
+class ExtendedTests extends BaseTests {
+
+  @Test
+  @DirtiesContext(hierarchyMode = CURRENT_LEVEL)
+  void test(){
+    
+  }
+}
+
+//
+@ContextConfiguration
+  @TestExecutionListeners({CustomTestExecutionListener.class,
+                          AnotherTestExecutionListener.class})
+  class CustomTestExecutionListenerTests{
+    
+  }
+
+//
+@Commit
+  @Test
+  void testProcessWithoutRollback(){
+  
+  }
+
+//
+@Rollback(false)
+  @Test
+  void testProcessWithoutRollback(){
+  
+  }
+
+//
+@BeforeTransaction
+  void beforeTransaction(){
+  
+  }
+
+//
+@AfterTransaction
+  void afterTransaction()
+  {
+  
+  }
+
+//
+@Test
+  @Sql({"/test-schema.sql","/test-user-data.sql"})
+  void userTest(){
+  
+  }
+
+//
+@Test
+  @Sql(
+    scripts = "/test-user-data.sql",
+    config = @SqlConfig(commentPrefix = "'" , separator = "@@")
+    
+  )
+
+  void userTest()
+  {
+  
+  }
+
+//
+@SpringJUnitConfig(TestConfig.class)
+  @Sql("/test-schema.sql")
+  @SqlMergeMode(MERGE)
+  class UserTests{
+
+    @Test
+    @Sql("/user-test-data-001.sql")
+    void standardUserProfile(){
+      
+    }
+  }
+
+//
+@SpringJUnitConfig(TestConfig.class)
+  @Sql("/test-schema.sql")
+  class UserTests{
+
+    @Test
+    @Sql("/user-test-data-001.sql")
+    @SqlMergeMode(MERGE)
+    void standardUserProfile(){
+      
+    }
+  }
+
+//
+@Test
+  @SqlGroup({
+  @Sql(scripts = "/test-schema.sql", config = @SqlConfig(commentPrefix = "'" )),
+    @Sql("/test-user-data.sql")
+  )}
+            void userTest()
+  {
+  
+  }
+
+//
+@Autowired
+  @Qualifier
+  @Value
+  @Resource
+  @ManagerBean
+  @Inject
+  @Named
+  @PersistenceContext
+  @PersistenceUnit
+  @Transactional
+
+  @IfProfileValue
+  @ProfileValueSourceConfiguration
+  @Timed
+  @Repeat
+  //
+  @IfProfileValue(name = "java.vendor", value = "Oracle Corporation")
+  @Test
+  public void testProcessWhichRunOnlyOnOracleJvm(){
+  
+  }
+
+//
+@IfProfileValue(name = "test-groups", value= {"unit-tests", "integration-tests"})
+  @Test 
+  public void testProcessWhichRunsForUnitOrIntegrationTestGroups(){
+  
+  }
+
+//
+@ProfileValueSourceConfiguration(CustomProfileValueSource.class)
+  public class CustomProfileValueSourceTests{
+    
+  }
+
+//
+@Time(millis = 1000)
+  public void testProcessWithOneSecondTimeout(){
+  
+  
+}
+//
+@Repeat(10)
+  @Test
+  fun testProcessRepeatedly(){
+  
+  }
+
+//
+@SpringJUnitConfig
+  @SpringJUnitWebConfing
+  @TestConstructor
+  @NestedTestConfiguration
+  @EnabledIf
+  @DisabledIf
+
+
+
+  @SpringJUitConfig(TestConfig.class)
+  class ConfigurationClassJUnitJupiterSpringTests{
+    
+  }
+
+//
+@SpringJUitConfig(locations = "test-config.xml")
+  class XmlJUitJupiterSpringTests{
+    
+  }
+
+//
+@SpringJUitWebConfig(TestConfig.class)
+  class ConfigurationClassJUitJupiterSpringWebTests{
+    
+  }
+
+//
+@BoorstrapWith
+  @ContextConfiguration
+  @WebAppConfiguration
+  @ContextHierarchy
+  @ActiveProfiles
+  @TestPropertySource
+  @DynamicPropertySource
+  @DirtiesContext
+  @TestExecutionListeners
+  @RecordApplicationEvents
+  @Transactional
+  @Commit
+  @Rollback
+  @Sql
+  @SqlConfig
+  @SqlMergeMode
+  @TestConstructor
+  //
+  @Target({ElementType.TYPE, ElementType.METHOD})
+  @Retention(RetentionPolicy.RUNTIME)
+  @EnabledIf(
+    expression = "#{systemProperties['os.name'].toLowerCase().contains('mac')}",
+    reason = "Enabled on Mac OS"
+    
+  )
+  public @interface EnabledOnMax {}
+
+//
+@Target({ElementType.TYPE, ElementType.METHOD})
+  @Retention(RetentionPolicy.RUNTIME)
+  @DisableIf(
+    expression = "#{systemProperties['os.name'].toLowercase().contains('mac')}",
+    reason = "Disabled on Mac OS"
+    
+  )
+
+  public @interface DisabledOnMax {}
+
+//
+@BootstrapWith
+  @ContextConfiguration
+  @ContextHierarchy
+  @ActiveProfiles
+  @TestPropertySource
+  @DirtiesContext
+  @WebAppConfiguration
+  @TestExecutionListeners
+  @Transactional
+  @BeforeTransaction
+  @AfterTransaction
+  @Commit
+  @Rollback
+  @Sql
+  @SqlConfig
+  @SqlMergeMode
+  @SqlGroup
+  @Repeat
+  @Timed
+  @IfProfileValue
+  @ProfileValueSourceConfiguration
+  @SpringJUnitWebConfig
+  @TestConstructor
+  @NestedTestConfiguration
+  @EnabledIf
+  @DisabledIf
+//
+  @RunWith(SpringRunner.class)
+  @ContextConfiguration({"/app-config.xml", "/test-data-access-config.xml"})
+
+  @ActiveProfiles("dev")
+  @Transactional
+  public class OrderRepositorytests{}
+
+@RunWith(SpringRunner.class)
+  @ContextConfiguration({"/app-config.xml", "/test-data-access-config.xml"})
+  @ActiveProfiles("dev")
+  @Transactional
+  public class OrderRepositorytests{}
+
+//
+@Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @ContextConfiguration( {"/app-config.xml", "/test-data-access-config.xml"})
+  @ActiveProfiles("dev")
+  @Transactional
+  public @interface TransactionalDevTestConfig {}
+//
+@RunWith(SpringRunner.class)
+  @TransactionalDevTestConfig
+  public class OrderRepositorytests{}
+
+@RunWith(SpringRunner.class)
+  @TransactionalDevelTestConfig
+  public class UserRepositoryTests{}
+
+//
+@ExtendWith(SpringExtension.class)
+  @ContextConfiguration({"/app-config.xml", "/test-data-access-config.xml"})
+  @ActiveProfiles("dev")
+  @Transactional
+  class OrderRepositoryTests{}
+
+@ExtendWith(SpringExtension.class)
+  @ContextConfiguration({"/app-config.xml", "/test-data-access-config.xml"})
+  @ActiveProfiles("dev")
+  @Transactional
+  class UserRepositoryTests{}
+
+//
+@Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @ExtendWith(SpringExtension.class)
+  @ContextConfiguration({"/app-config.xml", "/test-data-access-config.xml"})
+  @ActiveProfiles("dev")
+  @Transactional
+  public @interface TransactionalDevTestConfig {}
+
+//
+@TransactionalDevTestConfig
+  class OrderRepositoryTests{}
+
+@TransactionalDevTestConfig
+  class UserRepositoryTests{}
+
+//
+@Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  @Transactional
+  @Tag("integration-test")
+  @Test 
+  public @interface TransactionalIntegrationTest{}
+
+//519P
+@Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  @Transactional
+  @Tag("integration-test")
+  @Test
+  public @interface TransactionalIntegrationTest{}
+
+//
+
+TransactionalIntegrationTest
+  void saveOrder() {}
+
+  @TransactionalIntegrationTest
+  void deleteOrder() {}
+//
+
+@TestExecutionListeners(
+  listeners = {}
+  inheritListeners = false,
+  mergeMode = MERGE_WITH_DEFAULTS
+  class MyTest extends BaseTest{
+  
+  }
+
+//
+@ContextConfiguration
+  @TestExecutionListeners({
+    MyCustomeTestExecutionListener.class,
+    ServletTestExecutionListener.class,
+    DirtiesContextBeforeModesTestExecutionListener.class,
+    DependencyInjectionTestExecutionListener.class,
+    DirtiesContextTestExecutionListener.class,
+    TransactionalTestExecutionListener.class,
+    SqlScriptsTestExecutionListener.class
+  })
+  class MyTest{
+    
+  }
+
+//
+@ContextConfiguration
+  @TestExecutionListeners{
+  listeners = MyCustomeTestExecutionListener.class,
+    mergeMode = MERGE_WITH_DEFAULTS
+    )
+    class MyTest{
+    
+    }
+//
+  @SpringJUnitConfig(/**/)
+    @RecordApplicationEvents
+    class OrderServiceTests{
+
+      @Autowired
+      OrderService orderService;
+
+      @Autowired
+      ApplicationEvent events;
+    
+    @Test
+      void submitOrder(){
+  orderService.submitOrder(new Order(/**/));
+
+        long numEvents = events.stream(OrderSubmitted.class).count();
+        assertThat(numEvents).isEqualTo(1);
+        
+      }
+    }
+
+  //
+
+  @BeforeTestClassEvent
+    @PrepareTestInstanceEvent
+    @BeforeTestMethodEvent
+    @BeforeTestExecutionEvent
+    @AfterTestMethodEvent
+    @AfterTestExecutionEvent
+    @AfterTestClassEvent
+    //
+    @BeforeTestClass
+    @PrepareTestInstance
+    @BeforeTestMethod
+    @BeforeTestExecution
+    @AfterTestMethod
+    @AfterTestExecution
+    @AfterTestClass
+//
+    @SpringJUitConfig
+    class MyTest
+    {
+      @Autowired
+      ApplicationContext applicationContext;
+    }
+
+  //
+  @SpringJUnitConfig
+    class MyWebAppTest{
+
+      @Autowired
+      WebApplicationContext wac;
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration(loacation={"/app-config.xml", "/test-config.xml"})
+    class MyTest{
+      
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+    @ContextConfiguration({"/app-config.xml", "/test-config.xml"})
+class MyTest{
+  
+}
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration
+    class MyTest{
+      
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+    @ContextConfiguration({"/AppConfig.groovy", "/TestConfig.Groovy"})
+    
+    class MyTest{
+      
+    }
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration
+    class MyTest{
+      
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration({"/appConfig.xml", "/TestConfig.groovy"})
+    class MyTest{
+      
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration(classess = {AppConfig.class, TestConfig.class})
+    class MyTest{
+      
+    }
+
+  //
+  @SpringJUitConfig
+
+    class OrderServiceTest{
+
+      static class Config{
+
+        @Bean
+        OrderService orderService(){
+          OrderService orderService = new OrderServiceImpl();
+        
+        return orderService;
+        }
+      }
+
+      @Autowired
+      OrderService orderService;
+
+      @Test
+      void testOrderService(){
+        
+      }
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration{
+    classes = TestConfig.class,
+
+      initializers = TestAppCtxInitializers.class
+      class MyTest{
+      
+      }
+    }
+
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration(initializers = EntireAppInitializer.class)
+    class MyTest{
+      
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration("/base-config.xml")
+    class BaseTest{
+      
+    }
+
+  @ContextConfiguration("/extended-config.xml")
+    class ExtendedTest extends BaseTest{
+      
+    }
+
+  //
+  @SpringJUnitConfig(BaseConfig.class)
+    class BaseTest{
+      
+    }
+
+  @SpringJUnitConfig(ExtendedConfig.class)
+    class ExtendedTest extends BaseTest{
+      
+    }
+  //
+  @SpringJUnitConfig(initializers = BaseInitializer.class)
+    class BaseTest{
+      
+    }
+
+  @SpringJUnitConfig(initializers = ExtendedInitializer.class)
+    class ExtendedTest extends BaseTest{
+      
+    }
+
+  //
+  @ExtendWith(SpringExtension.class)
+
+    @ContextConfiguration("/app-config.xml"
+    )
+
+    @ActiveProfiles("dev")
+    class TransferServiceTest{
+
+      @Autowired
+      TranserService transferService;
+
+      @Test
+      void testTransferService(){
+        
+      }
+    }
+
+  //
+  @Configuration
+    @Profile("dev")
+    public class StandaloneDataConfig{
+
+      @Bean
+      public DataSource dataSource(){
+        return new EmbeddedDatabaseBuilder()
+          .setType(EmbeddedDatabaseType.HSQL)
+          .addScript("classpath:com/bank/config/sql/schema.sql")
+          .addScript("classpath:com/bank/config/sql/data.sql")
+          .build();
+      }
+    }
+
+  //
+  @Configuration
+    @Profile("production")
+    public class JndiDataConfig{
+
+      @Bean(destroyMethod = "")
+      public DataSource dataSource() throw Exception{
+        Context ctx = new InitialContext();
+        return (DataSource) ctx.lookup("java:comp/env/jdbc/datasource");
+      }
+    }
+
+  //
+  @Configuration
+    @Profile("default")
+    public class DefaultDataConfig{
+
+      @Bean
+      public DataSource dataSource(){
+        return new EmbbededDatabaseBuilder()
+          .setType(EmbeddedDatabaseType.HSQL)
+          .addScript("classpath:com/bank/config/sql/schema.sql")
+          .build();
+          }
+    }
+
+  //
+  @Configuration
+    public class TransfereServiceConfig{
+
+      @Autowired DataSource dataSource;
+
+      @Bean
+      public TransferService transferService()
+      return new DefaultTranserService(accoutRepository(),  feePolicy());
+    }
+
+@Bean 
+  public AccountRepository accountRepository(){
+  return new JdbcAccountRepository(dataSource);
+  }
+
+@Bean
+  public FeePolicy feePolicy(){
+  return bew ZeroFeePolicy();
+  }
+}
+
+
+//
+@SpringJUnitConfig({
+  TranserServiceConfig.class,
+  StandaloneDataConfig.class,
+  JudiDataConfig.class,
+  DefaultDataConfig.class})
+
+  @ActiveProfile("dev")
+  class TransferServiceTest{
+
+    @Autowired
+    TransferService transferService;
+    @Test
+    void testTransferService{
+      
+    }
+  }
+
+//
+@SpringJUnitConfig({
+    TransferServiceConfig.class,
+  StandaloneDataConfig.class,
+  JudiDataConfig.class,
+  DefaultDataConfig.class
+
+  
+})
+
+  @ActiveProfiles("dev")
+  abstract class AdstractIntegrationTest{
+    
+  }
+
+///
+class TransferServiceTest extends AbstractIntegrationTest{
+
+  @Autowired
+  TransferService transferService;
+
+  @Test
+  void testTransferService(){
+    
+  }
+}
+
+//
+@ActiveProfiles(profiles = "production", inheritProfiles = false)
+  class ProductionTransfereServiceTest extends AbstractIntegrationTest{
+    
+  }
+
+//
+@ActiveProfile(
+  resolver = OperationSystemProfileResolver.class,
+  inheritProfiles = false)
+  class TransferServiceTest extends AbstractIntegrationTest{
+    
+  }
+
+//
+public class OperationSystemProfileResolver implements ActiveProfileResolver{
+
+  @Override
+  public String resolve(Class<?> testClass){
+
+    String profile = ...;
+
+    return new String[] {profile};
+  }
+}
+
+//
+@ContextConfiguration
+  @TestPropertySource("/test.properties")
+
+  class MyIntegrationTests{
+    
+  }
+
+//
+@ContextConfiguration
+  @TestPropertySource(properties ={"timezone = GMT", port : 4242"}
+    class MyIntegrationTests{
+    
+    }
+
+///
+@ContextConfiguration
+
+  @TestPropertySource(
+    locations = "/test/properties",
+    properties = {"timezone = GMT", port : 4242"}
+    
+  )
+  class MyIntegrationTests{
+    
+  }
+
+//
+
+@TestPropertySource("base.properties")
+  @ContextConfiguration
+  class BaseTest{
+    
+  }
+
+@TestPropertySource("extended.properties")
+  @ContextConfiguration
+  class ExtendedTest extends BaseTest{
+
+
+    
+  }
+
+//
+@TestPropertySource(properties = "key1 = value1")
+  @ContextConfiguration
+  class BaseTest{
+    
+  }
+
+@TestPropertySource(properties = "key2 = value2")
+  @ContextConfiguration
+  class ExtendedTest extends BaseTest{
+    
+  }
+//
+@SpringJUnitConfig(/*...*/)
+  @TestContainers
+  class ExampleIntegrationTests{
+
+    @Container
+    static RedisContainer redis = new RedisContainer();
+
+    @DynamicProContainer redis = new RedisContainer();
+    static void redisProperties (DynamicPropertyRegistry registry){
+      registry.add("redis.port", redis::getHost);
+      registry.add("redis.host", redis::getMappedPort);
+    }
+
+    
+  }//559P
