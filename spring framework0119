@@ -1,0 +1,778 @@
+@Aspect
+public class ConcurrentOperationExecutor implements Ordered {
+
+  private static final int DEFAULT_MAX_PETRIES = 2;
+
+  private int maxRetries = DEFAULT_MAX_PETRIES;
+  private int order = 1;
+
+  public void setMaxRetries(int maxRetries) {
+    this.maxRetries = maxRetries;
+  }
+
+  public int getOrder() {
+    return this.order;
+  }
+
+  public void setOrder(int order) {
+    this.order = order;
+  }
+
+  @Around("com.xyz.myapp.CommonPointcuts.businessService()")
+  public Object doConcurrentOperation(ProceedingJoinPoint pjp) throws Throwable {
+    int numAttempts = 0;
+    PessimisticLockingFailureException lockFailureException;
+    do {
+      numAttemps++;
+
+      try {
+        return pjp.proceed();
+      } catch (PessimisticLockingFailureException ex) {
+        lockFailureException = ex;
+      }
+
+    } while (numAttempts <= this.maxRetries);
+    throw lockFailureException;
+  }
+}
+
+//
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Idempotent {
+
+  }
+  //
+@Around("com.xyz.myapp.CommonPointcuts.businessService() &&" +
+       "@annotation(com.xyz.myapp.service.Idempotent)")
+  public Object doConcurrentOperation(ProceedingJoinPoint pjp) throws Throwable{
+  
+  }
+
+  //
+  public void monitor(Object service){
+
+  }
+  //
+
+  public void doAccessCheck(Object retVal){
+
+  }
+
+  //
+  public void doRecoveryActions(DataAccessException dataAccessEx){
+
+  }
+
+  //
+  public Object doBasicProfiling(ProcessingJoinPoint pjp)throws Throwable{
+
+  Object retVal=pjp.proceed();return retVal;}
+
+  //
+  public interface PersonService {
+    Person getPerson(String personName, int age);
+  }
+
+  public class DefaultPersonService implements PersonService {
+
+    public Person getPerson(String name, int age) {
+      return new Person(name, age);
+    }
+  }
+
+  //
+  public class SimpleProfiler {
+
+    public Object profile(ProcessingJoinPoint call, String name, int age) throws Throwable {
+      StopWatch clock = new StopWatch("Profiling for'" + name + "' +and'" + age +
+          "'");
+
+      try {
+        clock.start(call.toShortString());
+        return call.proceed();
+      } finally {
+        clock.stop();
+        System.out.println(clock.prettyPrint());
+
+      }
+    }
+  }
+
+  //
+  public final class Boot {
+
+  public static void main(final String[] args)throws Exception{
+
+    BeanFactory ctx = new ClassPathXmlApplicationContext(x/y/plain.xml");
+    PersonService person = (PersonService) ctx.getBean("personService");
+    person.getPerson("Pengo", 12);
+  
+  }
+
+  }
+
+  //
+  public void recordUsage(UsageTracked usageTraked){usageTracked.incrementUseCount();}
+
+  //
+  UsageTracked usageTracked = (UsageTracked) context.getBean("myService");
+
+  //
+  public class ConcurrentOperationExecutor implements Ordered {
+
+    private static final int DEFAULT_MAX_PETRIES = 2;
+
+    private int maxRetries = DEFAULT_MAX_PETRIES;
+    private int order = 1;
+
+  }
+
+  public int getOrder(){return this.order;}
+
+  public void setOrder(int order){this.order=order;}
+
+  public Object doConcurrentOperation(ProceedingJoinPoint pjp)throws Throwable{int numAttempts=0;pessimisticLockingFailureException lockFailureException;do{numAttempts++;try{return pjp.proceed}catch(
+
+  PessimisticLockingFailureException ex)
+  {
+    lockFailureException = ex;
+  }
+}while(numAttempts<=this.maxRetries);throw lockFailureException();}}
+
+//
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Idempotent {
+
+  }
+  //
+
+@Point("execution(* get*())")
+  public void propertyAccess(){}
+
+  @Point("execution(org.xyz.Account+*(..))")
+  public void operationReturningAnAccount(){}
+
+  @Pointcut("propertyAccess() && operationReturningAnAccount()")
+  public void accountPropertyAccess(){}
+
+  //
+  public class SimplePojo implements Pojo {
+
+    public void foo() {
+      this.bar();
+    }
+
+    public void bar() {
+
+    }
+  }
+
+  //
+  public class Main {
+    public static void main(String[] args) {
+      Pojo pojo = new SimplePojo();
+
+      pojo.foo();
+    }
+  }
+
+  //
+  public class Main {
+
+    public static void main(String[] args) {
+
+      ProxyFactory factory = new ProxyFactory(new SimplePojo());
+      factory.addInterface(Pojo.class);
+      factory.addAdvice(new RetryAdvice());
+
+      Pojo pojo = (Pojo) factory.getProxy();
+
+      pojo.foo();
+    }
+  }
+
+  //
+  public class SimplePojo implements Pojo {
+
+    public void foo() {
+      ((Pojo) AopContext.currentProxy()).bar();
+    }
+
+    public void bar() {
+
+    }
+  }
+
+  //
+public class Main{
+
+  public static void main(String[] args){
+    ProcyFactory factory = new ProxyFactory(new SimplePojo());
+    factory.addInterface(Pojo.class);
+    factory.addAdvice(new RetryAdvice());
+    factory.setExposeProsy(true);
+
+    Pojo pojo = (Pojo)factory.getProxy();
+
+    pojo.foo();
+  }
+}
+
+  //
+  AspectJProxyFactory factory = new AspectJProxyFactory(targetObject());
+
+  factory.addAspect(SecurityManager.class);
+
+  an
+  @AspectJ aspect
+  factory.addAspect(usageTracker);
+
+  MyInterfaceType proxy = factory.getProxy();
+
+  //
+
+  @Configurable
+  public class Account {
+
+  }
+  //
+
+  @Configurable("account")
+  public class Account {
+
+  }
+
+  //
+  @Configurable(preConstruction = true)
+  //
+  @Configuraion
+  @EnableSpringConfigured
+  public class AppConfig {
+
+  }
+
+  //
+public aspect DomainObjectConfiguration extends AbstractBeanConfigurerAspect{
+
+  public DomainObjectConfiguration(){
+    setBeanWiringInfoResolver(new ClassNameBeanWiringInfoResolver());
+  }
+
+  protected pointcut beanCreation(Object in the domain model)initialization(new(..))&&CommonPointcuts.inDomainModel()&&this(beanInstance);}
+
+  //
+  //
+  @Aspect
+  public class ProfilingAspect {
+
+    @Around("methodToBeProfiled()")
+    public Object profile(ProceedingJoinPoint pjp) throws Throwable {
+      StopWatch sw = new StopWatch(getClass().getSimpleName());
+      try {
+        sw.start(pjp.getSignature().getName());
+        return pjp.proceed();
+      } finally {
+        sw.stop();
+        System.out.println(sw.prettyPrint());
+      }
+    }
+
+    @Pointcut("execution(public *foo.. *.*(..))")
+    public void methodToBeProfiled() {
+    }
+  }
+  //
+
+  public final class Main {
+
+    public static void main(String[] args) {
+      ApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml",
+          Main.class);
+
+      EntitlementCalculationService entitlementCalculationService = (EntitlementCalculationService) ctx
+          .getBean("entitlementCalculationService");
+
+      entitlementCalculationService.calculateEntitlement();
+    }
+  }
+
+  //
+  public final class Main {
+
+    public static void main(String[] args) {
+      new ClassPathXmlApplicationContext("beans.xml", Main.class);
+
+      EntitlementCalculationService entitlementCalculationService = new StubEntitlementCalculationService();
+
+      entitlementCalculationService.calculateEntitlement();
+    }
+  }
+
+  //
+  @Configuration
+  @EnableLoadTimeWeaving
+  public class AppConfig {
+
+  }
+
+  //
+  LoadTimeWeaver TomcatLoadTimeWeaver
+  GlassFishLoadTimeWeaver
+  JBossLoadTimeWeaver
+  WebSphereLoadTimeWeaver
+  WebLogicLoadTimeWeaver InstrumentationLoadTimeWeaver ReflectiveLoadTimeWeaver
+
+  @Configuration
+  @EnableLoadTimeWeaving
+  public class AppConfig implements LoadTimeWeavingConfigurer {
+
+    @Override
+    public LoadTimeWeaver getLoadTimeWeaver() {
+      return new ReflectiveLoadTimeWeaver();
+    }
+  }
+
+  //
+  public interface Pointcut {
+    ClassFiler getClassFile();
+
+    MethodMatcher getMethodMatcher();
+  }
+
+  //
+  public interface ClassFilter {
+    boolean matches(Class clazz);
+
+  }
+
+  public interface MethodMatcher {
+    boolean matches(Method m, Class<?> targetClass);
+
+    boolean isRuntime();
+
+    boolean matched(Method m, Class<?> targetClass, Object... args);
+  }
+
+  //
+  class TestStaticPointcut extends StaticMethodMatcherPointcut {
+
+    public boolean matched(Method m, Class targetClass) {
+
+    }
+  }
+
+  //
+  public interface MethodInterceptor extends Interceptor {
+
+    Object invoke(MethodInvocation invocation) throws Throwable;
+
+  }
+
+  //
+  public class DebugInterceptor implements Methods MethodInterceptor{
+
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+
+      System.out.println("Before: invocation=[" + invocation + "]");
+      Object rval = invocation.proceed();
+      System.out.prinln("Invocation returned");
+      return rval;
+
+    }
+  }
+
+  //
+  public interface MethodBeforeAdvice extends BeforeAdevice {
+
+    void before(Method m, Object[] args, Object target) throws Throwable;
+  }
+
+  //
+public class CountingBeforeAdvice implements MethodBeforeAdvice{
+
+  private int count;
+
+  public void before(Method m, Object[] args, Object target)throws Throwable{
+    ++count;
+  }
+
+  public int getCount(){
+    return count;
+  }
+}
+
+  //
+
+afterThrowing([Method, args, target], subclassOfThrowable)
+
+//
+  public class ReomoteThrowsAdvice implements ThrowsAdvice{
+
+  public void afterThrowing(RemoteException ex) throws Throwable{
+
+    
+  }
+  }
+
+//
+
+public class ServletThrowsAdviceWithArguments implements ThrowsAdvice{
+
+  public void afterThrowing(Method m, Object[] args, Object target, ServletException ex)
+  {
+    
+  }
+}
+
+//
+public static class CombinedThrowsAdvice implements ThrowsAdvice{
+
+  public void afterThrowing(RemoteException ex) throws Throwable{
+
+    
+  }
+}
+
+public void afterThrowing(Method m, Object[] args, Object target, ServletException ex)
+  {
+}
+  }
+
+//
+public interface AfterReturningAdvice extends Advice{
+  void afterReturning(Object returnValue, Method m, Object[] args, Object target) 
+  throws Throwable;
+}
+
+//
+public class CountingAfterReturningAdvice implements AfterReturningAdvice{
+  private int count;
+
+  public void afterReturning(Object returnValue, Method m, Object[] args, Object 
+                             target)
+
+  throws Throwable{
+    ++count;
+  }
+
+  public int getCount(){
+    return count;
+  }
+}
+
+//
+public interface IntroductionInterceptor extends MethodInterceptor{
+
+  boolean implementsInterface(Class intf);
+  
+}
+
+//
+public interface IntroduceAdvisor extends Advisor, IntroductionInfo{
+
+  ClassFilter getClassFilter();
+
+  void validateInterfaces() throws IllegalArgumentException;
+}
+
+public interface IntroductionInfo{
+
+  Class<?>[] getInterfaces();
+}
+//
+public interface Lockable{
+  void lock();
+  void unlock();
+  boolean locked();
+}
+//
+public class LockMixin extends DelegatingIntroductionInterceptor implements Lockable{
+
+  private boolean locked;
+
+  public void lock(){
+    this.locked = true;
+    
+  }
+
+  public void unlock(){
+    this.locked = false;
+  }
+
+  public boolean locked(){
+    return this.locked;
+  }
+
+  public Object invoke(MethodInvocation invocation) throws Throwable{
+    if(locked() && invocation.getMethod().getName().indexOf("set") == 0){
+      throw new LockedException();
+    }
+    return super.invoke(invocation);
+  }
+}
+//
+public class LockMixinAdvisor extends DefaultIntroductionadvisor{
+
+  public LockMixinAdvisor(){
+    super(new LockMixin(), Lockable.class);
+  }
+}
+//
+Persom person = (Person)factory.getBean("person");
+
+//
+ProxyFactory factory = new ProxyFactory(myBusinessInterfaceImpl);
+factory.addAdvice(myMethodInterceptor);
+factory.addAdvisor(myAdvisor)
+val tb = factory.proxy as MyBusinessInterface
+
+  //
+  Advisor[] getAdvisors();
+
+void addAdvice(Advice advice)throw AopConfigException;
+
+void addAdvice(int pos, Advice advice)throw AopConfigException;
+
+void addAdvisor(Advisor advisor) throws AopConfigException;
+
+void addAdvisor(int pos, Advisor advisor) throws AopConfigException;
+
+int indexOf(Advisor advisor);
+
+boolean removeAdvisor(Advisor advisor)throws AopConfigException;
+
+void removeAdvisor(int pos)throws AopConfigException;
+
+boolean replceAdvisor(Advisor a, Advisor b)throws AopConfigException;
+boolean isFrozen();
+
+//
+Advise advised = (Advised) myObject;
+Advisor[] advisors = advised.getAdvisors();
+int oldAdvisorCount = advisoors.length;
+System.out.println(oldAdvisorCount: " + "advisors");
+
+advised.addAdvice(new DefaultPointcutAdvisor(mySpecialPointcut, myAdvice));
+
+advised.addAdvisor(new DefaultPointcutAdvisor(mySpecialPointcut, myAdvice));
+
+assertEquals("Added two advisors", oldAdvisorCount + 2, advised.getAdvisors().length);
+
+//
+HotSwappableTargetSource swappwe = (HotSwappableTargetSource)
+  beanFactory.getBean("swapper");
+Object oldTarget = swapper.swap(newTarget);
+
+//
+PoolingConfig conf = (PoolingConfig) beanFactory.getBean("businessObject");
+System.out.println("Max pool size is " + conf.getMaxSize());
+
+//
+
+DataBuffer buffer = factory.allocateBuffer();
+boolean release = true;
+
+try{
+
+  release = false;
+}
+finally{
+  if(release){
+    DataBuffer.release(buffer);
+  }
+}
+
+return buffer;
+
+//
+public class MyBean{
+  private final Log log = LogFactory.getLog(getClass());
+}
+
+//
+@Configuration(proxyBeanMethods = false)
+  @ComponentScan
+  @Import({DataSourceConfig.class,ContainerConfiguration.class})
+  public class MyApplication{
+    
+  }
+
+//
+GenericApplicationContext applicationContext = new 
+  AnnotationConfigApplicationContext();
+context.register(MyApplication.class);
+context.refreshForAotProcessing();
+
+
+//
+@Configuration(proxyBeanMethods = false)
+  public class DataSourceConfiguration{
+
+    @Bean
+    public SimpleDataSource dataSource(){
+      return new SimpleDataSource();
+    }
+  }
+//
+public class DataSourceConfiguration__BeanDefinitions{
+
+  public static BeanDefinition getDataSourceConfigurationBeanDefinition(){
+    Class<?> beanType = DataSourceConfiguration.class;
+    RootBeanDefinition beanDefinition = new RootBeanDefinition(beanType);
+    beanDefinition.setInstanceSupplier(DataSourceConfiguration::new);
+    return beanDefinition;
+  }
+
+  private static BeanInstanceSupplier<SimpleDataSource>
+  getDataSourceInstanceSupplier(){}
+  return
+  BeanInstanceSupplier.<SimpleDataSource>forFactoryMethod(DataSourceConfiguration.class, "dataSource")
+
+    .withGenerator((registeredBean) -> 
+                  registeredBean.getBeanFactory().getBean(DataSourceConfiguration.class).dataSource());
+  }
+
+public static BeanDefinition getDataSourceBeanDefinition(){
+
+  Class<?> beanType = SimpleDataSource.class;
+  RootBeanDefinition beanDefinition = new RootBeanDefinition(beanType);
+  beanDefinition.setInstanceSupplier(getDataSourceInstanceSupplier());
+  return beanDefinition;
+}
+}
+
+//
+runtimeHints.resource().registerPattern("config/app.properties");
+
+//
+@Component
+  @ImportRuntimeHints(MyComponentRuntimeHints.class)
+  public class MyComponent{
+
+    private static class MyComponentRuntimeHints implements RuntimeHintsRegistrar{
+
+      @Override
+      public void registerHints(RuntimeHints hints, ClassLoader class Loader){
+        
+      }
+    }
+  }
+
+//
+@Component
+  public class OrderService{
+
+    @RegisterReflectionForBinding(Account.class)
+    public void process(Order order){
+      
+    }
+  }
+
+//
+public enum PersistenceContextType{
+
+TRANSACTION,
+  EXTENDED
+  
+
+
+}
+
+//
+public class Client{
+
+  private PersistenceContextType persistenceContextType;
+
+  public void setPersistenceContextType(PersistenceContextType type){
+    this.persistenceContextType = type;
+    
+  }
+}
+
+//
+
+public class MyNamespaceHandler extends NamespaceHandlerSupport{
+
+  public void init(){
+    registerBeanDefinitionParser("dataformat", new 
+                                SimpleDataFormatBeanDefinitionParser());
+  }
+}
+
+//
+public class SimpleDataFormatBeanDefinitionParser extends 
+  AbstractBeanDefinitionParser{
+
+  protected Class getBeanClass(Element element){
+    return SimpleDataFormat.class;
+  }
+
+  protected void doParse(Element element, BeanDefinitionBuilder bean){
+
+    String pattern= element.getAttribute("pattern");
+
+    bean.addConstructorArgValue(pattern);
+
+    String lenient = element.getAttribute("lenient");
+
+    if(StringUtils.hasText(lenient)){
+      bean.addPropertyValue("lenient", Boolean.valueOf(lenient)");
+    }
+  }
+  }
+
+//
+public class Component{
+  private String name;
+  private List<Component> components = new ArrayList<Component>();
+
+  public void addComponent(Component component){
+    this.components.add(component);
+  }
+
+  public List<Component> getComponets(){}
+  return compoenents;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name ){
+    this.name = name;
+  }
+}
+
+//
+public class ComponentFactoryBean implements FactoryBean<Component>{
+
+  private Component parent;
+  private List<Component> children;
+
+  public void setParent(Component parent){
+    this.parent = parent;
+  }
+
+  public void setChildren(List<Component> children){
+    this.children = children;
+  }
+
+  public Component getObject() throws Exception{
+    if(this.children != null && this.children.size() > 0){
+      for(Component child : this.children){
+        this.parent.addComponent(child);
+      }
+    }
+    return this.parent;
+  }
+
+  public Class<Component>getObjectType(){
+  return Component.class;
+}
+
+  public boolean isSingletone()
+  return true;
+}
+}
+//465P
